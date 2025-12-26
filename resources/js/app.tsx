@@ -1,4 +1,4 @@
-import React, { StrictMode, type FC, useMemo, useCallback } from "react";
+import React, { StrictMode, type FC, useMemo } from "react";
 import ReactDOM from "react-dom/client";
 import {
     BrowserRouter,
@@ -26,6 +26,7 @@ import "antd/dist/reset.css";
 import ProfileForm from "./components/ProfileForm";
 import LoginForm from "./components/LoginForm";
 import WeatherCard from "./components/WeatherCard";
+import BooksPage from "./components/BooksPage";
 import type { ISpec } from "@visactor/vchart";
 
 const { Header, Content, Footer } = Layout;
@@ -36,12 +37,13 @@ const navItems = [
     { key: "/profile", label: "กรอกข้อมูลส่วนตัว" },
     { key: "/login", label: "เข้าสู่ระบบ" },
     { key: "/weather", label: "กราฟสภาพอากาศ" },
+    { key: "/books", label: "รายการหนังสือ (React)" },
 ];
 
 const AppShell: FC = () => {
     const location = useLocation();
 
-    const weatherData = useCallback((format: string) => {
+    const weatherData = useMemo(() => {
         const days = dayjs().daysInMonth();
         return Array.from({ length: days }, (_, idx) => {
             const temperature =
@@ -51,7 +53,7 @@ const AppShell: FC = () => {
             return {
                 date: dayjs()
                     .date(idx + 1)
-                    .format(format || "DD"),
+                    .format("YYYY-MM-DD"),
                 temperature: Number(temperature.toFixed(1)),
             };
         });
@@ -63,7 +65,7 @@ const AppShell: FC = () => {
             height: 320,
             data: {
                 id: "temp",
-                values: weatherData("DD"),
+                values: weatherData,
             },
             xField: "date",
             yField: "temperature",
@@ -72,11 +74,7 @@ const AppShell: FC = () => {
             color: ["#1677ff"],
             axes: [
                 { orient: "left", title: "อุณหภูมิ (°C)" },
-                {
-                    orient: "bottom",
-                    type: "band",
-                    label: { autoHide: true },
-                },
+                { orient: "bottom", type: "band", label: { autoHide: true } },
             ],
             tooltip: {
                 mark: {
@@ -90,6 +88,13 @@ const AppShell: FC = () => {
         }),
         [weatherData]
     );
+
+    const activeKey =
+        navItems.find(
+            (item) =>
+                location.pathname === item.key ||
+                location.pathname.startsWith(`${item.key}/`)
+        )?.key ?? "/";
 
     return (
         <ConfigProvider
@@ -122,9 +127,7 @@ const AppShell: FC = () => {
                     </Space>
                     <Menu
                         mode="horizontal"
-                        selectedKeys={[
-                            location.pathname === "/" ? "/" : location.pathname,
-                        ]}
+                        selectedKeys={[activeKey]}
                         items={navItems.map((item) => ({
                             key: item.key,
                             label: <Link to={item.key}>{item.label}</Link>,
@@ -144,9 +147,14 @@ const AppShell: FC = () => {
                                 element={
                                     <WeatherCard
                                         chartSpec={chartSpec}
-                                        data={weatherData("YYYY-MM-DD")}
+                                        data={weatherData}
                                     />
                                 }
+                            />
+                            <Route path="/books" element={<BooksPage />} />
+                            <Route
+                                path="/books/:page"
+                                element={<BooksPage />}
                             />
                             <Route
                                 path="*"
@@ -175,8 +183,8 @@ const Home: FC = () => (
             </Title>
         </div>
         <Paragraph className="hero__meta">
-            เลือกเมนูด้านบนเพื่อไปยังหน้ากรอกข้อมูลส่วนตัว, เข้าสู่ระบบ
-            หรือดูกราฟสภาพอากาศ/อุณหภูมิของเดือนนี้
+            เลือกเมนูด้านบนเพื่อไปยังหน้ากรอกข้อมูลส่วนตัว, เข้าสู่ระบบ,
+            กราฟสภาพอากาศ หรือหน้าแสดงรายการหนังสือที่ดึงข้อมูลจาก API (React)
         </Paragraph>
 
         <Card
@@ -189,6 +197,7 @@ const Home: FC = () => (
                     ไปหน้าข้อมูลส่วนตัว
                 </Button>
                 <Button href="/login">ไปหน้าเข้าสู่ระบบ</Button>
+                <Button href="/books">ไปหน้ารายการหนังสือ</Button>
                 <Button
                     icon={<BookOutlined />}
                     href="https://ant.design"
@@ -203,15 +212,15 @@ const Home: FC = () => (
         <Card title="สิ่งที่คุณได้รับ" variant="outlined">
             <Space direction="vertical">
                 <Text>
-                    • ตัวอย่างหน้าหลัก + หน้า Profile + หน้า Login + หน้า
-                    Weather (แยก route ชัดเจน)
+                    • หน้าหลัก + Profile + Login + Weather + Books (แยก route
+                    ชัดเจน)
                 </Text>
                 <Text>
-                    • คอมโพเนนต์ถูกแยกไว้ใน `resources/js/components`
+                    • คอมโพเนนต์แยกใน `resources/js/components`
                     นำกลับมาใช้ซ้ำได้
                 </Text>
                 <Text>
-                    • ใช้ React Router (`react-router-dom`) สำหรับจัดการเส้นทาง
+                    • หน้า Books ใช้ React fetch `/api/books` และรองรับแบ่งหน้า
                 </Text>
             </Space>
         </Card>
