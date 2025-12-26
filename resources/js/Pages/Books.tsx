@@ -1,38 +1,38 @@
 import { useEffect, useState } from "react";
 import { Card, Typography, Pagination, Skeleton, Row, Col, Alert } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { router, usePage } from "@inertiajs/react";
+import AppLayout from "../Layouts/AppLayout";
 
 type Book = { title: string; author: string; summary: string };
-type ApiResponse = {
-    data: Book[];
-    pagination: { page: number; perPage: number; totalPages: number; totalItems: number };
+
+type PageProps = {
+    books: Book[];
+    pagination: {
+        page: number;
+        perPage: number;
+        totalPages: number;
+        totalItems: number;
+    };
 };
 
-const parsePage = (raw?: string) => {
-    const n = Number(raw);
-    return Number.isFinite(n) && n > 0 ? Math.floor(n) : 1;
-};
-
-const BooksPage = () => {
-    const params = useParams();
-    const navigate = useNavigate();
-
-    const [books, setBooks] = useState<Book[]>([]);
-    const [page, setPage] = useState<number>(parsePage(params.page));
-    const [totalPages, setTotalPages] = useState<number>(1);
+const Books = () => {
+    const { props } = usePage<PageProps>();
+    const [books, setBooks] = useState<Book[]>(props.books ?? []);
+    const [page, setPage] = useState<number>(props.pagination?.page ?? 1);
+    const [totalPages, setTotalPages] = useState<number>(props.pagination?.totalPages ?? 1);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchBooks = async (targetPage: number, replaceUrl = false) => {
+    const fetchBooks = async (targetPage: number) => {
         try {
             setLoading(true);
             setError(null);
             const res = await fetch(`/api/books?page=${targetPage}&perPage=6`);
-            const json: ApiResponse = await res.json();
+            const json = await res.json();
             setBooks(json.data);
             setPage(json.pagination.page);
             setTotalPages(json.pagination.totalPages);
-            navigate(`/books/${targetPage}`, { replace: replaceUrl });
+            router.visit(`/books/${targetPage}`, { replace: true, preserveScroll: true, preserveState: true });
         } catch (err) {
             setError("โหลดข้อมูลไม่สำเร็จ");
         } finally {
@@ -40,21 +40,22 @@ const BooksPage = () => {
         }
     };
 
+    // sync when props change (SSR render / first load)
     useEffect(() => {
-        const target = parsePage(params.page);
-        fetchBooks(target, true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [params.page]);
+        setBooks(props.books ?? []);
+        setPage(props.pagination?.page ?? 1);
+        setTotalPages(props.pagination?.totalPages ?? 1);
+    }, [props.books, props.pagination]);
 
     return (
-        <>
+        <AppLayout>
             <div className="hero__header">
                 <Typography.Title level={2} style={{ margin: 0 }}>
-                    รายการหนังสือ (React + fetch)
+                    รายการหนังสือ (SSR + React)
                 </Typography.Title>
             </div>
             <Typography.Paragraph className="hero__meta">
-                ตัวอย่างหน้า React ดึงข้อมูลจาก API `/api/books` แล้วแสดงการ์ด พร้อมเปลี่ยนหน้า `/books/1`, `/books/2`
+                ตัวอย่าง Inertia หน้าเดียว ใช้ข้อมูลจากเซิร์ฟเวอร์ (props) และสามารถเปลี่ยนหน้า `/books/N` ได้
             </Typography.Paragraph>
 
             {error && (
@@ -102,8 +103,8 @@ const BooksPage = () => {
                     onChange={(next) => fetchBooks(next)}
                 />
             </div>
-        </>
+        </AppLayout>
     );
 };
 
-export default BooksPage;
+export default Books;

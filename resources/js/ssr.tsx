@@ -1,25 +1,25 @@
 import React from "react";
-import { createRoot, type Root } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
 import "../css/app.css";
 
-const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+export default function render(page: any) {
+    const appName = process.env.VITE_APP_NAME || "Laravel";
 
-createInertiaApp({
-    title: (title) => `${title ? `${title} - ` : ""}${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.tsx`,
-            import.meta.glob("./Pages/**/*.tsx"),
-        ),
-    setup({ el, App, props }) {
-        const root: Root = createRoot(el);
-
-        root.render(
-            <React.StrictMode>
+    return createInertiaApp({
+        page,
+        title: (title) => `${title ? `${title} - ` : ""}${appName}`,
+        render: renderToString,
+        resolve: (name) =>
+            resolvePageComponent(
+                `./Pages/${name}.tsx`,
+                import.meta.glob("./Pages/**/*.tsx"),
+            ),
+        setup({ App, props }) {
+            return (
                 <ConfigProvider
                     theme={{
                         token: {
@@ -30,10 +30,7 @@ createInertiaApp({
                 >
                     <App {...props} />
                 </ConfigProvider>
-            </React.StrictMode>,
-        );
-    },
-    progress: {
-        color: "#1677ff",
-    },
-});
+            );
+        },
+    });
+}
