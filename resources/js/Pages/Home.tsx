@@ -41,7 +41,7 @@ const Home: FC = () => (
 
         <Divider />
         <Card title="สิ่งที่คุณได้รับ" variant="outlined">
-            <Space direction="vertical">
+            <Space orientation="vertical">
                 <Text>
                     • หน้าหลัก + Profile + Login + Weather + Books (แยก route
                     ชัดเจน)
@@ -51,7 +51,7 @@ const Home: FC = () => (
                     และแชร์คอมโพเนนต์จาก `resources/js/components`
                 </Text>
                 <Text>
-                    • หน้า Books ดึงข้อมูลจาก `/api/books` และรองรับแบ่งหน้า
+                    • หน้า card ดึงข้อมูลจาก `/api/card` และรองรับแบ่งหน้า
                 </Text>
             </Space>
         </Card>

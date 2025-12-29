@@ -35,7 +35,7 @@ $booksData = function (): Collection {
     ]);
 };
 
-Route::get('/card/{page?}', function (int $page = 1) use ($booksData) {
+Route::get('/books/{page?}', function (int $page = 1) use ($booksData) {
     $perPage = 6;
     $items = $booksData();
     $totalItems = $items->count();
@@ -43,7 +43,7 @@ Route::get('/card/{page?}', function (int $page = 1) use ($booksData) {
     $currentPage = max(1, min($page, $totalPages));
     $pagedItems = $items->forPage($currentPage, $perPage)->values();
 
-    return Inertia::render('Card', [
+    return Inertia::render('Books', [
         'books' => $pagedItems,
         'pagination' => [
             'page' => $currentPage,
@@ -54,7 +54,7 @@ Route::get('/card/{page?}', function (int $page = 1) use ($booksData) {
     ]);
 });
 
-Route::get('/books/{page?}', function (int $page = 1) use ($booksData) {
+Route::get('/card/{page?}', function (int $page = 1) use ($booksData) {
     $perPage = 6;
     $items = $booksData();
     $totalItems = $items->count();
@@ -62,7 +62,7 @@ Route::get('/books/{page?}', function (int $page = 1) use ($booksData) {
     $currentPage = max(1, min($page, $totalPages));
     $pagedItems = $items->forPage($currentPage, $perPage)->values();
 
-    return Inertia::render('Books', [
+    return Inertia::render('Card', [
         'books' => $pagedItems,
         'pagination' => [
             'page' => $currentPage,

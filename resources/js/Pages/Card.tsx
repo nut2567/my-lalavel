@@ -34,11 +34,6 @@ const Books = () => {
             setBooks(json.data);
             setPage(json.pagination.page);
             setTotalPages(json.pagination.totalPages);
-            router.visit(`/card/${targetPage}`, {
-                replace: true,
-                preserveScroll: true,
-                preserveState: true,
-            });
         } catch (err) {
             setError("โหลดข้อมูลไม่สำเร็จ");
         } finally {
