@@ -3,10 +3,12 @@ import { createRoot, type Root } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ConfigProvider } from "antd";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "antd/dist/reset.css";
 import "../css/app.css";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+const queryClient = new QueryClient();
 
 createInertiaApp({
     title: (title) => `${title ? `${title} - ` : ""}${appName}`,
@@ -28,7 +30,9 @@ createInertiaApp({
                         },
                     }}
                 >
-                    <App {...props} />
+                    <QueryClientProvider client={queryClient}>
+                        <App {...props} />
+                    </QueryClientProvider>
                 </ConfigProvider>
             </React.StrictMode>,
         );

@@ -30,6 +30,6 @@
     },
     "overrides": {
         "minimist": "^1.2.8",
-        "axios": "^1.13.0"
+        "axios": "^1.13.2"
     }
 }

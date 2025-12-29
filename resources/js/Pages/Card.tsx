@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Card, Typography, Pagination, Skeleton, Row, Col, Alert } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "@inertiajs/react";
-import AppLayout from "../Layouts/AppLayout";
+import LibraryLayout from "../Layouts/LibraryLayout";
 
 type Book = { title: string; author: string; summary: string };
 
@@ -16,16 +16,14 @@ type ApiResponse = {
     };
 };
 
-const CardPage = () => <Books />;
-
-const Books = () => {
+const CardPage = () => {
     const initialPage = useMemo(() => {
         const url = new URL(window.location.href);
         const fromQuery = Number(url.searchParams.get("page"));
         return Number.isFinite(fromQuery) && fromQuery > 0 ? fromQuery : 1;
     }, []);
 
-    const [page, setPage] = useState<number>(initialPage);
+    const [page, setPage] = useState<number>(initialPage || 1);
     const perPage = 6;
 
     const { data, isFetching, error } = useQuery<ApiResponse>({
@@ -56,7 +54,7 @@ const Books = () => {
     };
 
     return (
-        <AppLayout>
+        <LibraryLayout>
             <div className="hero__header">
                 <Typography.Title level={2} style={{ margin: 0 }}>
                     Card list (React Query + API)
@@ -84,7 +82,7 @@ const Books = () => {
                             xs={24}
                             sm={12}
                             md={8}
-                            key={`${book.title}-${idx}`}
+                            key={`${book?.title}-${idx}`}
                         >
                             <Card variant="outlined" style={{ height: "100%" }}>
                                 {isFetching ? (
@@ -126,7 +124,7 @@ const Books = () => {
                     onChange={(next) => goToPage(next)}
                 />
             </div>
-        </AppLayout>
+        </LibraryLayout>
     );
 };
 
