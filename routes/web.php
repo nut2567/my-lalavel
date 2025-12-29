@@ -54,33 +54,17 @@ Route::get('/books/{page?}', function (int $page = 1) use ($booksData) {
     ]);
 });
 
-Route::get('/card/{page?}', function (int $page = 1) use ($booksData) {
-    $perPage = 6;
-    $items = $booksData();
-    $totalItems = $items->count();
-    $totalPages = (int) ceil($totalItems / $perPage);
-    $currentPage = max(1, min($page, $totalPages));
-    $pagedItems = $items->forPage($currentPage, $perPage)->values();
+Route::get('/card', fn () => Inertia::render('Card'));
 
-    return Inertia::render('Card', [
-        'books' => $pagedItems,
-        'pagination' => [
-            'page' => $currentPage,
-            'perPage' => $perPage,
-            'totalPages' => $totalPages,
-            'totalItems' => $totalItems,
-        ],
-    ]);
-});
-
-Route::get('/api/card', function (Request $request) use ($booksData) {
+Route::get('/api/card/{page?}', function (Request $request, int $page = 1) use ($booksData) {
     $perPage = (int) $request->query('perPage', 6);
-    $page = (int) $request->query('page', 1);
+    $pageFromPath = $page;
+    $pageFromQuery = (int) $request->query('page', $pageFromPath);
 
     $items = $booksData();
     $totalItems = $items->count();
     $totalPages = (int) ceil($totalItems / $perPage);
-    $currentPage = max(1, min($page, $totalPages));
+    $currentPage = max(1, min($pageFromQuery, $totalPages));
     $pagedItems = $items->forPage($currentPage, $perPage)->values();
 
     return response()->json([

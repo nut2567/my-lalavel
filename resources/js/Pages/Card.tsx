@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, Typography, Pagination, Skeleton, Row, Col, Alert } from "antd";
-import { router, usePage } from "@inertiajs/react";
+import { useQuery } from "@tanstack/react-query";
+import { router } from "@inertiajs/react";
 import AppLayout from "../Layouts/AppLayout";
 
 type Book = { title: string; author: string; summary: string };
 
-type PageProps = {
-    books: Book[];
+type ApiResponse = {
+    data: Book[];
     pagination: {
         page: number;
         perPage: number;
@@ -15,74 +16,78 @@ type PageProps = {
     };
 };
 
+const CardPage = () => <Books />;
+
 const Books = () => {
-    const { props } = usePage<PageProps>();
-    const [books, setBooks] = useState<Book[]>(props.books ?? []);
-    const [page, setPage] = useState<number>(props.pagination?.page ?? 1);
-    const [totalPages, setTotalPages] = useState<number>(
-        props.pagination?.totalPages ?? 1
-    );
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
+    const initialPage = useMemo(() => {
+        const url = new URL(window.location.href);
+        const fromQuery = Number(url.searchParams.get("page"));
+        return Number.isFinite(fromQuery) && fromQuery > 0 ? fromQuery : 1;
+    }, []);
 
-    const fetchBooks = async (targetPage: number) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const res = await fetch(`/api/card?page=${targetPage}&perPage=6`);
-            const json = await res.json();
-            setBooks(json.data);
-            setPage(json.pagination.page);
-            setTotalPages(json.pagination.totalPages);
-        } catch (err) {
-            setError("โหลดข้อมูลไม่สำเร็จ");
-        } finally {
-            setLoading(false);
-        }
+    const [page, setPage] = useState<number>(initialPage);
+    const perPage = 6;
+
+    const { data, isFetching, error } = useQuery<ApiResponse>({
+        queryKey: ["card", page, perPage],
+        queryFn: async () => {
+            const res = await fetch(`/api/card/${page}?perPage=${perPage}`);
+            if (!res.ok) throw new Error("Failed to load books");
+            return res.json();
+        },
+    });
+
+    const books = data?.data ?? [];
+    const totalPages = data?.pagination.totalPages ?? 1;
+
+    const goToPage = (next: number) => {
+        setPage(next);
+        // Let Inertia manage the URL (history) without manual replaceState
+        router.get(
+            "/card",
+            { page: next },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: [],
+            }
+        );
     };
-
-    // sync when props change (SSR render / first load)
-    useEffect(() => {
-        setBooks(props.books ?? []);
-        setPage(props.pagination?.page ?? 1);
-        setTotalPages(props.pagination?.totalPages ?? 1);
-    }, [props.books, props.pagination]);
 
     return (
         <AppLayout>
             <div className="hero__header">
                 <Typography.Title level={2} style={{ margin: 0 }}>
-                    รายการหนังสือ (SSR + first)
+                    Card list (React Query + API)
                 </Typography.Title>
             </div>
             <Typography.Paragraph className="hero__meta">
-                ตัวอย่าง Inertia หน้าเดียว ใช้ข้อมูลจากเซิร์ฟเวอร์ (props)
-                และสามารถเปลี่ยนหน้า `/books/N` ได้
+                ใช้ React Query ดึงข้อมูลจาก /api/card/{page + "?"}และให้
+                Inertia อัปเดต URL ?page=
             </Typography.Paragraph>
 
             {error && (
                 <Alert
                     type="error"
                     showIcon
+                    closable
                     style={{ marginBottom: 16 }}
-                    title={error}
-                    action={
-                        <Typography.Link
-                            onClick={() => fetchBooks(page)}
-                            underline
-                        >
-                            ลองใหม่
-                        </Typography.Link>
-                    }
+                    message={(error as Error).message}
                 />
             )}
 
             <Row gutter={[16, 16]}>
-                {(loading ? Array.from({ length: 6 }) : books).map(
+                {(isFetching ? Array.from({ length: perPage }) : books).map(
                     (book: Book, idx) => (
-                        <Col xs={24} sm={12} md={8} key={idx}>
+                        <Col
+                            xs={24}
+                            sm={12}
+                            md={8}
+                            key={`${book.title}-${idx}`}
+                        >
                             <Card variant="outlined" style={{ height: "100%" }}>
-                                {loading ? (
+                                {isFetching ? (
                                     <Skeleton active paragraph={{ rows: 3 }} />
                                 ) : (
                                     <>
@@ -99,7 +104,7 @@ const Books = () => {
                                                 marginBottom: 8,
                                             }}
                                         >
-                                            โดย {book?.author}
+                                            ผู้เขียน {book?.author}
                                         </Typography.Text>
                                         <Typography.Paragraph>
                                             {book?.summary}
@@ -115,14 +120,14 @@ const Books = () => {
             <div style={{ marginTop: 16, textAlign: "center" }}>
                 <Pagination
                     current={page}
-                    total={totalPages * 10}
-                    pageSize={10}
+                    total={totalPages * perPage}
+                    pageSize={perPage}
                     showSizeChanger={false}
-                    onChange={(next) => fetchBooks(next)}
+                    onChange={(next) => goToPage(next)}
                 />
             </div>
         </AppLayout>
     );
 };
 
-export default Books;
+export default CardPage;
