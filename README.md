@@ -26,13 +26,15 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 ลำดับเริ่มต้นเวลา `php artisan serve` หรือเว็บถูกเรียก:
 
 -   `public/index.php`: entry point; โหลด autoload แล้วเรียก `bootstrap/app.php` เพื่อสร้างแอป
--   `bootstrap/app.php`: สร้าง `Illuminate\Foundation\Application` แล้วส่งให้ HTTP Kernel
--   `app/Http/Kernel.php`: ลงทะเบียน middleware กลาง/กลุ่ม route แล้วส่งต่อเข้า router
+-   `bootstrap/app.php`: สร้าง `Illuminate\Foundation\Application` แล้วส่งให้ HTTP Kernel provider ถูกฝังใน framework และให้เราคอนฟิกผ่าน app.php แทน
+-   `app.php`: ลงทะเบียน middleware ด้วย withMiddleware แล้วส่งต่อเข้า router ด้วย withRouting แล้วจะเข้าไปสู่
 -   `routes/web.php`: map URL → controller/action หรือ Inertia render
 -   Controller: ทำงานตาม route แล้วส่ง response; ถ้า Inertia จะ `Inertia::render(...)`
 -   `app/Http/Middleware/HandleInertiaRequests.php`: เติม shared props/version ก่อนตอบ
--   Frontend `resources/js/app.js`: mount Inertia app; import `./bootstrap.js`
--   Page component (เช่น `resources/js/Pages/Books.tsx`): หน้าแรกที่ผู้ใช้เห็นตามเส้นทางที่เรียก
+-   เมื่อเข้า browser หน้าแรก `:porject.test/`
+-   Frontend `resources/js/app.tsx`: mount Inertia app; import `./bootstrap.js`
+-   Page component (เช่น `resources/js/Pages/Home.tsx`): หน้าแรกที่ผู้ใช้เห็นตามเส้นทางที่เรียก
+-   `Route::get('/', fn() => Inertia::render('Home'));`
 
 artisan เป็นสคริปต์ CLI ของ Laravel ใช้รันคำสั่งสำหรับพัฒนา/ดูแลระบบ (เช่น migrate, serve, queue, make:model ฯลฯ). มันบูตแอประหว่างรันคำสั่งแต่ไม่ได้ตอบเว็บ.
 

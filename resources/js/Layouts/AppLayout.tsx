@@ -13,15 +13,17 @@ type AppLayoutProps = {
 const navItems = [
     { key: "/", label: "หน้าหลัก" },
     { key: "/profile", label: "กรอกข้อมูลส่วนตัว" },
-    { key: "/login", label: "เข้าสู่ระบบ" },
     { key: "/weather", label: "กราฟสภาพอากาศ" },
-    { key: "/books", label: "รายการหนังสือ (React)" },
+    { key: "/books", label: "รายการหนังสือ" },
+    { key: "/card", label: "รายการข้อมูล" },
 ];
 
 const AppLayout: FC<AppLayoutProps> = ({ children }) => {
     const { url } = usePage();
     const activeKey =
-        navItems.find((item) => url === item.key || url.startsWith(`${item.key}/`))?.key ?? "/";
+        navItems.find(
+            (item) => url === item.key || url.startsWith(`${item.key}/`)
+        )?.key ?? "/";
 
     return (
         <Layout className="app-shell">

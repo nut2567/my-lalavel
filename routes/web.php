@@ -5,10 +5,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', fn () => Inertia::render('Home'));
-Route::get('/profile', fn () => Inertia::render('Profile'));
-Route::get('/login', fn () => Inertia::render('Login'));
-Route::get('/weather', fn () => Inertia::render('Weather'));
+Route::get('/', fn() => Inertia::render('Home'));
+Route::get('/profile', fn() => Inertia::render('Profile'));
+Route::get('/login', fn() => Inertia::render('Login'));
+Route::get('/weather', fn() => Inertia::render('Weather'));
 
 $booksData = function (): Collection {
     return collect([
@@ -35,6 +35,25 @@ $booksData = function (): Collection {
     ]);
 };
 
+Route::get('/card/{page?}', function (int $page = 1) use ($booksData) {
+    $perPage = 6;
+    $items = $booksData();
+    $totalItems = $items->count();
+    $totalPages = (int) ceil($totalItems / $perPage);
+    $currentPage = max(1, min($page, $totalPages));
+    $pagedItems = $items->forPage($currentPage, $perPage)->values();
+
+    return Inertia::render('Card', [
+        'books' => $pagedItems,
+        'pagination' => [
+            'page' => $currentPage,
+            'perPage' => $perPage,
+            'totalPages' => $totalPages,
+            'totalItems' => $totalItems,
+        ],
+    ]);
+});
+
 Route::get('/books/{page?}', function (int $page = 1) use ($booksData) {
     $perPage = 6;
     $items = $booksData();
@@ -54,7 +73,7 @@ Route::get('/books/{page?}', function (int $page = 1) use ($booksData) {
     ]);
 });
 
-Route::get('/api/books', function (Request $request) use ($booksData) {
+Route::get('/api/card', function (Request $request) use ($booksData) {
     $perPage = (int) $request->query('perPage', 6);
     $page = (int) $request->query('page', 1);
 
