@@ -11,15 +11,34 @@
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   [Simple, fast routing engine](https://laravel.com/docs/routing).
+-   [Powerful dependency injection container](https://laravel.com/docs/container).
+-   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+-   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+-   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+-   [Robust background job processing](https://laravel.com/docs/queues).
+-   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
+
+## App bootstrap flow (Laravel + Inertia)
+
+ลำดับเริ่มต้นเวลา `php artisan serve` หรือเว็บถูกเรียก:
+
+-   `public/index.php`: entry point; โหลด autoload แล้วเรียก `bootstrap/app.php` เพื่อสร้างแอป
+-   `bootstrap/app.php`: สร้าง `Illuminate\Foundation\Application` แล้วส่งให้ HTTP Kernel
+-   `app/Http/Kernel.php`: ลงทะเบียน middleware กลาง/กลุ่ม route แล้วส่งต่อเข้า router
+-   `routes/web.php`: map URL → controller/action หรือ Inertia render
+-   Controller: ทำงานตาม route แล้วส่ง response; ถ้า Inertia จะ `Inertia::render(...)`
+-   `app/Http/Middleware/HandleInertiaRequests.php`: เติม shared props/version ก่อนตอบ
+-   Frontend `resources/js/app.js`: mount Inertia app; import `./bootstrap.js`
+-   Page component (เช่น `resources/js/Pages/Books.tsx`): หน้าแรกที่ผู้ใช้เห็นตามเส้นทางที่เรียก
+
+artisan เป็นสคริปต์ CLI ของ Laravel ใช้รันคำสั่งสำหรับพัฒนา/ดูแลระบบ (เช่น migrate, serve, queue, make:model ฯลฯ). มันบูตแอประหว่างรันคำสั่งแต่ไม่ได้ตอบเว็บ.
+
+index.php เป็น entry point ของเว็บทุก request HTTP; โหลด autoload, บูตแอป (app.php), ส่งผ่าน kernel/middleware แล้วตอบ response หน้าเว็บ.
+
+สรุป: artisan = command-line interface สำหรับงาน dev/ops; index.php = จุดเริ่มต้นฝั่งเว็บสำหรับทุก HTTP request.
 
 ## Learning Laravel
 
@@ -33,14 +52,14 @@ We would like to extend our thanks to the following sponsors for funding Laravel
 
 ### Premium Partners
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   **[Vehikl](https://vehikl.com)**
+-   **[Tighten Co.](https://tighten.co)**
+-   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+-   **[64 Robots](https://64robots.com)**
+-   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+-   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+-   **[Redberry](https://redberry.international/laravel-development)**
+-   **[Active Logic](https://activelogic.com)**
 
 ## Contributing
 

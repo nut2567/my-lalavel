@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { Card, Typography, Pagination, Skeleton, Row, Col, Alert } from "antd";
-import { router, usePage } from "@inertiajs/react";
+import { Card, Typography, Row, Col, Alert } from "antd";
+import { Link, usePage } from "@inertiajs/react";
 import AppLayout from "../Layouts/AppLayout";
 
 type Book = { title: string; author: string; summary: string };
@@ -13,39 +12,14 @@ type PageProps = {
         totalPages: number;
         totalItems: number;
     };
+    error?: string | null;
 };
 
 const Books = () => {
     const { props } = usePage<PageProps>();
-    const [books, setBooks] = useState<Book[]>(props.books ?? []);
-    const [page, setPage] = useState<number>(props.pagination?.page ?? 1);
-    const [totalPages, setTotalPages] = useState<number>(props.pagination?.totalPages ?? 1);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const fetchBooks = async (targetPage: number) => {
-        try {
-            setLoading(true);
-            setError(null);
-            const res = await fetch(`/api/books?page=${targetPage}&perPage=6`);
-            const json = await res.json();
-            setBooks(json.data);
-            setPage(json.pagination.page);
-            setTotalPages(json.pagination.totalPages);
-            router.visit(`/books/${targetPage}`, { replace: true, preserveScroll: true, preserveState: true });
-        } catch (err) {
-            setError("โหลดข้อมูลไม่สำเร็จ");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // sync when props change (SSR render / first load)
-    useEffect(() => {
-        setBooks(props.books ?? []);
-        setPage(props.pagination?.page ?? 1);
-        setTotalPages(props.pagination?.totalPages ?? 1);
-    }, [props.books, props.pagination]);
+    const books = props.books ?? [];
+    const page = props.pagination?.page ?? 1;
+    const totalPages = props.pagination?.totalPages ?? 1;
 
     return (
         <AppLayout>
@@ -55,56 +29,65 @@ const Books = () => {
                 </Typography.Title>
             </div>
             <Typography.Paragraph className="hero__meta">
-                ตัวอย่าง Inertia หน้าเดียว ใช้ข้อมูลจากเซิร์ฟเวอร์ (props) และสามารถเปลี่ยนหน้า `/books/N` ได้
+                หน้า Inertia ที่เรนเดอร์จากเซิร์ฟเวอร์ทุกครั้งเมื่อเปลี่ยนหน้า เช่น `/books/2`, `/books/3`
             </Typography.Paragraph>
 
-            {error && (
-                <Alert
-                    type="error"
-                    showIcon
-                    style={{ marginBottom: 16 }}
-                    message={error}
-                    action={
-                        <Typography.Link onClick={() => fetchBooks(page)} underline>
-                            ลองใหม่
-                        </Typography.Link>
-                    }
-                />
+            {props.error && (
+                <Alert type="error" showIcon style={{ marginBottom: 16 }} message={props.error} />
             )}
 
             <Row gutter={[16, 16]}>
-                {(loading ? Array.from({ length: 6 }) : books).map((book: Book, idx) => (
-                    <Col xs={24} sm={12} md={8} key={idx}>
+                {books.map((book: Book, idx) => (
+                    <Col xs={24} sm={12} md={8} key={`${book.title}-${idx}`}>
                         <Card variant="outlined" style={{ height: "100%" }}>
-                            {loading ? (
-                                <Skeleton active paragraph={{ rows: 3 }} />
-                            ) : (
-                                <>
-                                    <Typography.Title level={4} style={{ marginTop: 0 }}>
-                                        {book?.title}
-                                    </Typography.Title>
-                                    <Typography.Text type="secondary" style={{ display: "block", marginBottom: 8 }}>
-                                        โดย {book?.author}
-                                    </Typography.Text>
-                                    <Typography.Paragraph>{book?.summary}</Typography.Paragraph>
-                                </>
-                            )}
+                            <Typography.Title level={4} style={{ marginTop: 0 }}>
+                                {book.title}
+                            </Typography.Title>
+                            <Typography.Text type="secondary" style={{ display: "block", marginBottom: 8 }}>
+                                โดย {book.author}
+                            </Typography.Text>
+                            <Typography.Paragraph>{book.summary}</Typography.Paragraph>
                         </Card>
                     </Col>
                 ))}
             </Row>
 
-            <div style={{ marginTop: 16, textAlign: "center" }}>
-                <Pagination
-                    current={page}
-                    total={totalPages * 10}
-                    pageSize={10}
-                    showSizeChanger={false}
-                    onChange={(next) => fetchBooks(next)}
-                />
+            <div
+                style={{
+                    marginTop: 16,
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 8,
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                }}
+            >
+                <PageLink target={Math.max(1, page - 1)} label="ก่อนหน้า" disabled={page === 1} />
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                    <PageLink key={p} target={p} label={p.toString()} active={p === page} />
+                ))}
+                <PageLink target={Math.min(totalPages, page + 1)} label="ถัดไป" disabled={page === totalPages} />
             </div>
         </AppLayout>
     );
 };
+
+type PageLinkProps = {
+    target: number;
+    label: string;
+    active?: boolean;
+    disabled?: boolean;
+};
+
+const PageLink = ({ target, label, active, disabled }: PageLinkProps) => (
+    <Link
+        href={`/books/${target}`}
+        preserveState={false}
+        preserveScroll={false}
+        className={`page-link ${active ? "active" : ""} ${disabled ? "disabled" : ""}`}
+    >
+        {label}
+    </Link>
+);
 
 export default Books;

@@ -52,3 +52,32 @@ body {
         padding: 72px 32px;
     }
 }
+
+.page-link {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #e3e6ee;
+    background: #fff;
+    color: #1f1f1f;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    font-weight: 500;
+}
+
+.page-link:hover {
+    border-color: #1677ff;
+    color: #1677ff;
+    box-shadow: 0 4px 12px rgba(22, 119, 255, 0.15);
+}
+
+.page-link.active {
+    background: #1677ff;
+    border-color: #1677ff;
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(22, 119, 255, 0.3);
+}
+
+.page-link.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
