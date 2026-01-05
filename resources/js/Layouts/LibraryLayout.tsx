@@ -1,6 +1,10 @@
-import { Layout, Menu, Typography } from "antd";
-import { BookOutlined, AppstoreOutlined } from "@ant-design/icons";
-import type { FC, ReactNode } from "react";
+import { Drawer, Layout, Menu, Typography, Button, Grid } from "antd";
+import {
+    BookOutlined,
+    AppstoreOutlined,
+    MenuOutlined,
+} from "@ant-design/icons";
+import { useState, type FC, type ReactNode } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import AppLayout from "./AppLayout";
 
@@ -21,6 +25,9 @@ const libraryNav = [
  */
 const LibraryLayout: FC<LibraryLayoutProps> = ({ children }) => {
     const { url } = usePage();
+    const screens = Grid.useBreakpoint();
+    const [mobileSiderOpen, setMobileSiderOpen] = useState(false);
+    const isMobile = !screens.md;
     const activeKey =
         libraryNav.find(
             (item) =>
@@ -29,58 +36,65 @@ const LibraryLayout: FC<LibraryLayoutProps> = ({ children }) => {
                 url.startsWith(`${item.key}?`)
         )?.key ?? "/books";
 
+    const renderNav = (onNavigate?: () => void) => (
+        <>
+            <Typography.Title level={5} style={{ margin: "4px 0 12px 12px" }}>
+                Library
+            </Typography.Title>
+            <Menu
+                mode="inline"
+                selectedKeys={[activeKey]}
+                items={libraryNav.map((item) => ({
+                    key: item.key,
+                    icon: item.icon,
+                    label: (
+                        <Link
+                            href={item.key}
+                            preserveScroll={false}
+                            preserveState={false}
+                            onClick={onNavigate}
+                        >
+                            {item.label}
+                        </Link>
+                    ),
+                }))}
+                style={{
+                    borderInlineEnd: "none",
+                }}
+            />
+        </>
+    );
+
     return (
         <AppLayout>
             <Layout
-                hasSider
+                hasSider={!isMobile}
                 style={{
                     background: "transparent",
                     gap: 16,
                 }}
                 className="library-shell"
             >
-                <Sider
-                    width={240}
-                    theme="light"
-                    style={{
-                        background: "#fff",
-                        borderRadius: 12,
-                        border: "1px solid #f0f0f0",
-                        padding: 12,
-                        position: "sticky",
-                        top: 88,
-                        alignSelf: "flex-start",
-                    }}
-                    breakpoint="xxl"
-                    collapsedWidth={0}
-                >
-                    <Typography.Title
-                        level={5}
-                        style={{ margin: "4px 0 12px 12px" }}
-                    >
-                        Library
-                    </Typography.Title>
-                    <Menu
-                        mode="inline"
-                        selectedKeys={[activeKey]}
-                        items={libraryNav.map((item) => ({
-                            key: item.key,
-                            icon: item.icon,
-                            label: (
-                                <Link
-                                    href={item.key}
-                                    preserveScroll={false}
-                                    preserveState={false}
-                                >
-                                    {item.label}
-                                </Link>
-                            ),
-                        }))}
+                {!isMobile && (
+                    <Sider
+                        width={240}
+                        theme="light"
                         style={{
-                            borderInlineEnd: "none",
+                            background: "#fff",
+                            borderRadius: 12,
+                            border: "1px solid #f0f0f0",
+                            padding: 12,
+                            position: "sticky",
+                            top: 88,
+                            alignSelf: "flex-start",
                         }}
-                    />
-                </Sider>
+                        breakpoint="md"
+                        collapsedWidth={0}
+                    >
+                        {renderNav()}
+                    </Sider>
+                )}
+
                 <Content
                     style={{
                         minHeight: 360,
@@ -91,6 +105,40 @@ const LibraryLayout: FC<LibraryLayoutProps> = ({ children }) => {
                         boxShadow: "0 12px 30px rgba(0,0,0,0.05)",
                     }}
                 >
+                    {isMobile && (
+                        <>
+                            <Button
+                                type="text"
+                                icon={<MenuOutlined />}
+                                onClick={() => setMobileSiderOpen(true)}
+                                style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    padding: 0,
+                                    marginBottom: 12,
+                                }}
+                            >
+                                Library menu
+                            </Button>
+                            <Drawer
+                                open={mobileSiderOpen}
+                                onClose={() => setMobileSiderOpen(false)}
+                                closable={false}
+                                placement="left"
+                                size={260}
+                                styles={{
+                                    body: {
+                                        padding: 12,
+                                    },
+                                }}
+                                maskClosable
+                            >
+                                {renderNav(() => setMobileSiderOpen(false))}
+                            </Drawer>
+                        </>
+                    )}
+
                     {children}
                 </Content>
             </Layout>

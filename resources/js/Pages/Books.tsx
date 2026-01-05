@@ -1,8 +1,18 @@
-import { Card, Typography, Row, Col, Alert } from "antd";
-import { Link, usePage } from "@inertiajs/react";
+import {
+    Card,
+    Typography,
+    Row,
+    Col,
+    Alert,
+    Button,
+    Space,
+    Tag,
+    Modal,
+} from "antd";
+import { Link, router, usePage } from "@inertiajs/react";
 import LibraryLayout from "../Layouts/LibraryLayout";
 
-type Book = { title: string; author: string; summary: string };
+type Book = { id: number; title: string; author: string; summary?: string };
 
 type PageProps = {
     books: Book[];
@@ -12,7 +22,9 @@ type PageProps = {
         totalPages: number;
         totalItems: number;
     };
-    error?: string | null;
+    flash?: {
+        success?: string;
+    };
 };
 
 const Books = () => {
@@ -20,38 +32,65 @@ const Books = () => {
     const books = props.books ?? [];
     const page = props.pagination?.page ?? 1;
     const totalPages = props.pagination?.totalPages ?? 1;
+    const flashSuccess = props.flash?.success;
+
+    const goToPage = (target: number) => {
+        router.get(
+            "/books",
+            { page: target },
+            { preserveState: true, preserveScroll: true, replace: true }
+        );
+    };
+
+    const handleDelete = (bookId: number) => {
+        Modal.confirm({
+            title: "ลบหนังสือ",
+            content: "ต้องการลบรายการนี้หรือไม่?",
+            okText: "ลบ",
+            okButtonProps: { danger: true },
+            cancelText: "ยกเลิก",
+            onOk: () =>
+                router.delete(`/books/${bookId}`, {
+                    preserveScroll: true,
+                }),
+        });
+    };
 
     return (
         <LibraryLayout>
-            <div className="hero__header">
-                <Typography.Title level={2} style={{ margin: 0 }}>
-                    รายการหนังสือ (SSR React Prop)
-                </Typography.Title>
+            <div className="hero__header" style={{ marginBottom: 16 }}>
+                <div style={{ flex: 1 }}>
+                    <Typography.Title level={2} style={{ margin: 0 }}>
+                        รายการหนังสือ
+                    </Typography.Title>
+                    <Typography.Text type="secondary">
+                        ข้อมูลดึงจากฐานข้อมูลผ่าน Eloquent
+                    </Typography.Text>
+                </div>
+                <Link href="/books/create">
+                    <Button type="primary">เพิ่มหนังสือ</Button>
+                </Link>
             </div>
-            <Typography.Paragraph className="hero__meta">
-                หน้า Inertia ที่เรนเดอร์จากเซิร์ฟเวอร์ทุกครั้งเมื่อเปลี่ยนหน้า
-                เช่น `/books/2`, `/books/3`
-            </Typography.Paragraph>
 
-            {props.error && (
+            {flashSuccess && (
                 <Alert
-                    type="error"
+                    type="success"
                     showIcon
+                    closable
                     style={{ marginBottom: 16 }}
-                    title={props.error}
+                    message={flashSuccess}
                 />
             )}
 
             <Row gutter={[16, 16]}>
-                {books.map((book: Book, idx) => (
-                    <Col xs={24} sm={12} md={8} key={`${book.title}-${idx}`}>
-                        <Card variant="outlined" style={{ height: "100%" }}>
-                            <Typography.Title
-                                level={4}
-                                style={{ marginTop: 0 }}
-                            >
-                                {book.title}
-                            </Typography.Title>
+                {books.map((book: Book) => (
+                    <Col xs={24} sm={12} md={8} key={book.id}>
+                        <Card
+                            variant="outlined"
+                            style={{ height: "100%" }}
+                            title={book.title}
+                            extra={<Tag color="blue">Book</Tag>}
+                        >
                             <Typography.Text
                                 type="secondary"
                                 style={{
@@ -59,69 +98,87 @@ const Books = () => {
                                     marginBottom: 8,
                                 }}
                             >
-                                โดย {book.author}
+                                ผู้เขียน {book.author}
                             </Typography.Text>
-                            <Typography.Paragraph>
-                                {book.summary}
+                            <Typography.Paragraph
+                                ellipsis={{ rows: 3, expandable: true }}
+                            >
+                                {book.summary || "-"}
                             </Typography.Paragraph>
+
+                            <Space size={8}>
+                                <Link href={`/books/${book.id}/edit`}>
+                                    <Button size="small">แก้ไข</Button>
+                                </Link>
+                                <Button
+                                    size="small"
+                                    danger
+                                    onClick={() => handleDelete(book.id)}
+                                >
+                                    ลบ
+                                </Button>
+                            </Space>
                         </Card>
                     </Col>
                 ))}
+                {!books.length && (
+                    <Col span={24}>
+                        <Alert
+                            type="info"
+                            message="ยังไม่มีข้อมูลหนังสือ ลองเพิ่มเล่มแรกได้เลย"
+                            showIcon
+                        />
+                    </Col>
+                )}
             </Row>
 
-            <div
-                style={{
-                    marginTop: 16,
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 8,
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                }}
-            >
-                <PageLink
-                    target={Math.max(1, page - 1)}
-                    label="ก่อนหน้า"
-                    disabled={page === 1}
-                />
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (p) => (
-                        <PageLink
-                            key={p}
-                            target={p}
-                            label={p.toString()}
-                            active={p === page}
-                        />
-                    )
-                )}
-                <PageLink
-                    target={Math.min(totalPages, page + 1)}
-                    label="ถัดไป"
-                    disabled={page === totalPages}
+            <div style={{ marginTop: 16, textAlign: "center" }}>
+                <PaginationLinks
+                    current={page}
+                    totalPages={totalPages}
+                    onChange={goToPage}
                 />
             </div>
         </LibraryLayout>
     );
 };
 
-type PageLinkProps = {
-    target: number;
-    label: string;
-    active?: boolean;
-    disabled?: boolean;
+type PaginationLinksProps = {
+    current: number;
+    totalPages: number;
+    onChange: (page: number) => void;
 };
 
-const PageLink = ({ target, label, active, disabled }: PageLinkProps) => (
-    <Link
-        href={`/books/${target}`}
-        preserveState={false}
-        preserveScroll={false}
-        className={`page-link ${active ? "active" : ""} ${
-            disabled ? "disabled" : ""
-        }`}
-    >
-        {label}
-    </Link>
+const PaginationLinks = ({
+    current,
+    totalPages,
+    onChange,
+}: PaginationLinksProps) => (
+    <Space size="small" wrap>
+        <Button
+            type="text"
+            disabled={current <= 1}
+            onClick={() => onChange(Math.max(1, current - 1))}
+        >
+            ก่อนหน้า
+        </Button>
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+            <Button
+                key={p}
+                type={p === current ? "primary" : "default"}
+                onClick={() => onChange(p)}
+            >
+                {p}
+            </Button>
+        ))}
+        <Button
+            type="text"
+            disabled={current >= totalPages}
+            onClick={() => onChange(Math.min(totalPages, current + 1))}
+        >
+            ถัดไป
+        </Button>
+    </Space>
 );
 
 export default Books;

@@ -10,5 +10,5 @@ Route::get('/login', [PageController::class, 'login']);
 Route::get('/weather', [PageController::class, 'weather']);
 Route::get('/card', [PageController::class, 'card']);
 
-Route::get('/books/{page?}', [BookController::class, 'index']);
+Route::resource('books', BookController::class)->except(['show']);
 require __DIR__ . '/api.php';
