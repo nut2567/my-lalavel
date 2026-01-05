@@ -29,9 +29,9 @@ body {
 }
 
 .hero {
-    max-width: 960px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 48px 24px;
+    padding: 48px 12px;
 }
 
 .hero__header {
@@ -45,12 +45,6 @@ body {
 .hero__meta {
     color: #5c5f66;
     margin-bottom: 32px;
-}
-
-@media (min-width: 768px) {
-    .hero {
-        padding: 72px 32px;
-    }
 }
 
 .page-link {

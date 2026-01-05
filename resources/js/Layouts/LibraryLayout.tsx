@@ -51,7 +51,7 @@ const LibraryLayout: FC<LibraryLayoutProps> = ({ children }) => {
                         top: 88,
                         alignSelf: "flex-start",
                     }}
-                    breakpoint="lg"
+                    breakpoint="xxl"
                     collapsedWidth={0}
                 >
                     <Typography.Title

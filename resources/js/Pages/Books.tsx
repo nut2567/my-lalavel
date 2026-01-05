@@ -38,7 +38,7 @@ const Books = () => {
                     type="error"
                     showIcon
                     style={{ marginBottom: 16 }}
-                    message={props.error}
+                    title={props.error}
                 />
             )}
 
