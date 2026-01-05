@@ -32,9 +32,6 @@ const Edit = () => {
                 <Typography.Title level={2} style={{ margin: 0 }}>
                     แก้ไขหนังสือ
                 </Typography.Title>
-                <Typography.Text type="secondary">
-                    {book.title}
-                </Typography.Text>
             </div>
 
             <BookForm form={form} onSubmit={submit} submitLabel="อัปเดต" />

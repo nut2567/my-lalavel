@@ -78,7 +78,7 @@ const Books = () => {
                     showIcon
                     closable
                     style={{ marginBottom: 16 }}
-                    message={flashSuccess}
+                    title={flashSuccess}
                 />
             )}
 
