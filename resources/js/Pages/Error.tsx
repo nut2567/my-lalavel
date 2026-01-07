@@ -1,6 +1,5 @@
 import { Result, Button, Space } from "antd";
 import { Link } from "@inertiajs/react";
-import AppLayout from "../Layouts/AppLayout";
 
 type Props = {
     status: number;
@@ -37,34 +36,30 @@ const ErrorPage = ({ status }: Props) => {
     const data = content[status] ?? fallback;
 
     return (
-        <AppLayout>
-            <div className="hero">
-                <Result
-                    status={status as any}
-                    title={status}
-                    subTitle={
-                        <div>
-                            <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                                {data.title}
-                            </div>
-                            <div style={{ color: "#5c5f66" }}>
-                                {data.subtitle}
-                            </div>
+        <div className="hero">
+            <Result
+                status={status as any}
+                title={status}
+                subTitle={
+                    <div>
+                        <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                            {data.title}
                         </div>
-                    }
-                    extra={
-                        <Space>
-                            <Link href="/">
-                                <Button type="primary">กลับหน้า หลัก</Button>
-                            </Link>
-                            <Link href="/books">
-                                <Button>ไปหน้าหนังสือ</Button>
-                            </Link>
-                        </Space>
-                    }
-                />
-            </div>
-        </AppLayout>
+                        <div style={{ color: "#5c5f66" }}>{data.subtitle}</div>
+                    </div>
+                }
+                extra={
+                    <Space>
+                        <Link href="/">
+                            <Button type="primary">กลับหน้า หลัก</Button>
+                        </Link>
+                        <Link href="/books">
+                            <Button>ไปหน้าหนังสือ</Button>
+                        </Link>
+                    </Space>
+                }
+            />
+        </div>
     );
 };
 

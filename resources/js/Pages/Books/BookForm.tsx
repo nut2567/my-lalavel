@@ -18,59 +18,93 @@ type BookFormProps = {
     submitLabel: string;
 };
 
-const BookForm = ({ form, onSubmit, submitLabel }: BookFormProps) => (
-    <Form layout="vertical" onFinish={onSubmit}>
-        <Form.Item
-            label="ชื่อเรื่อง"
-            required
-            validateStatus={form.errors.title ? "error" : undefined}
-            help={form.errors.title}
-        >
-            <Input
-                value={form.data.title}
-                onChange={(e) => form.setData("title", e.target.value)}
-                placeholder="เช่น The Wind and the Sea"
-            />
-        </Form.Item>
-        <Form.Item
-            label="ผู้เขียน"
-            required
-            validateStatus={form.errors.author ? "error" : undefined}
-            help={form.errors.author}
-        >
-            <Input
-                value={form.data.author}
-                onChange={(e) => form.setData("author", e.target.value)}
-                placeholder="เช่น Mara Lane"
-            />
-        </Form.Item>
-        <Form.Item
-            label="สรุปเนื้อหา"
-            validateStatus={form.errors.summary ? "error" : undefined}
-            help={form.errors.summary}
-        >
-            <Input.TextArea
-                value={form.data.summary}
-                onChange={(e) => form.setData("summary", e.target.value)}
-                autoSize={{ minRows: 4, maxRows: 8 }}
-                placeholder="คำอธิบายหรือเนื้อหาโดยย่อ"
-            />
-        </Form.Item>
+const BookForm = ({ form, onSubmit, submitLabel }: BookFormProps) => {
+    const [antdForm] = Form.useForm<BookFormState>();
+    const normalizedData = {
+        ...form.data,
+        summary: form.data.summary ?? "",
+    };
 
-        <Space>
-            <Button
-                type="primary"
-                htmlType="submit"
-                loading={form.processing}
-                disabled={form.processing}
+    return (
+        <Form
+            layout="vertical"
+            form={antdForm}
+            initialValues={normalizedData}
+            onValuesChange={(changedValues) => {
+                Object.entries(changedValues).forEach(([key, value]) => {
+                    form.setData(
+                        key as keyof BookFormState,
+                        typeof value === "string" ? value : value ?? ""
+                    );
+                });
+            }}
+            onFinish={(values) => {
+                Object.entries(values).forEach(([key, value]) => {
+                    form.setData(
+                        key as keyof BookFormState,
+                        typeof value === "string" ? value : value ?? ""
+                    );
+                });
+                onSubmit();
+            }}
+        >
+            <Form.Item
+                label="ชื่อเรื่อง"
+                required
+                name="title"
+                rules={[
+                    {
+                        required: true,
+                        message: "กรอกชื่อเรื่อง",
+                    },
+                ]}
+                validateStatus={form.errors.title ? "error" : undefined}
+                help={form.errors.title}
             >
-                {submitLabel}
-            </Button>
-            <Link href="/books">
-                <Button disabled={form.processing}>ยกเลิก</Button>
-            </Link>
-        </Space>
-    </Form>
-);
+                <Input placeholder="เช่น The Wind and the Sea" />
+            </Form.Item>
+            <Form.Item
+                label="ผู้เขียน"
+                required
+                name="author"
+                rules={[
+                    {
+                        required: true,
+                        message: "กรอกชื่อผู้เขียน",
+                    },
+                ]}
+                validateStatus={form.errors.author ? "error" : undefined}
+                help={form.errors.author}
+            >
+                <Input placeholder="เช่น Mara Lane" />
+            </Form.Item>
+            <Form.Item
+                label="สรุปเนื้อหา"
+                validateStatus={form.errors.summary ? "error" : undefined}
+                help={form.errors.summary}
+                name="summary"
+            >
+                <Input.TextArea
+                    autoSize={{ minRows: 4, maxRows: 8 }}
+                    placeholder="คำอธิบายหรือเนื้อหาโดยย่อ"
+                />
+            </Form.Item>
+
+            <Space>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={form.processing}
+                    disabled={form.processing}
+                >
+                    {submitLabel}
+                </Button>
+                <Link href="/books">
+                    <Button disabled={form.processing}>ยกเลิก</Button>
+                </Link>
+            </Space>
+        </Form>
+    );
+};
 
 export default BookForm;

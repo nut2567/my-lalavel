@@ -1,11 +1,6 @@
 import type { FC } from "react";
-import AppLayout from "../Layouts/AppLayout";
 import LoginForm from "../components/LoginForm";
 
-const Login: FC = () => (
-    <AppLayout>
-        <LoginForm />
-    </AppLayout>
-);
+const Login: FC = () => <LoginForm />;
 
 export default Login;

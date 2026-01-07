@@ -2,12 +2,11 @@ import { Card, Typography, Space, Button, Divider } from "antd";
 import { RocketOutlined, BookOutlined } from "@ant-design/icons";
 import { Link } from "@inertiajs/react";
 import type { FC } from "react";
-import AppLayout from "../Layouts/AppLayout";
 
 const { Title, Paragraph, Text } = Typography;
 
 const Home: FC = () => (
-    <AppLayout>
+    <>
         <div className="hero__header">
             <RocketOutlined style={{ fontSize: 26, color: "#1677ff" }} />
             <Title level={2} style={{ margin: 0 }}>
@@ -55,7 +54,7 @@ const Home: FC = () => (
                 </Text>
             </Space>
         </Card>
-    </AppLayout>
+    </>
 );
 
 export default Home;

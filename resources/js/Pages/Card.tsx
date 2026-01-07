@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactElement } from "react";
 import { Card, Typography, Pagination, Skeleton, Row, Col, Alert } from "antd";
 import { useQuery } from "@tanstack/react-query";
 import { router } from "@inertiajs/react";
@@ -54,7 +54,7 @@ const CardPage = () => {
     };
 
     return (
-        <LibraryLayout>
+        <>
             <div className="hero__header">
                 <Typography.Title level={2} style={{ margin: 0 }}>
                     Card list (React Query + API)
@@ -124,8 +124,10 @@ const CardPage = () => {
                     onChange={(next) => goToPage(next)}
                 />
             </div>
-        </LibraryLayout>
+        </>
     );
 };
+
+CardPage.layout = (page: ReactElement) => <LibraryLayout>{page}</LibraryLayout>;
 
 export default CardPage;

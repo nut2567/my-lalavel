@@ -11,6 +11,7 @@ import {
     Pagination,
 } from "antd";
 import { Link, router, usePage } from "@inertiajs/react";
+import type { ReactElement } from "react";
 import LibraryLayout from "../Layouts/LibraryLayout";
 
 type Book = { id: number; title: string; author: string; summary?: string };
@@ -58,7 +59,7 @@ const Books = () => {
     };
 
     return (
-        <LibraryLayout>
+        <>
             <div className="hero__header" style={{ marginBottom: 16 }}>
                 <div style={{ flex: 1 }}>
                     <Typography.Title level={2} style={{ margin: 0 }}>
@@ -144,8 +145,10 @@ const Books = () => {
                     showTotal={(total) => `ทั้งหมด ${total} รายการ`}
                 />
             </div>
-        </LibraryLayout>
+        </>
     );
 };
+
+Books.layout = (page: ReactElement) => <LibraryLayout>{page}</LibraryLayout>;
 
 export default Books;

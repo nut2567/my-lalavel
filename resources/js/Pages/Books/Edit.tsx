@@ -1,5 +1,6 @@
 import { Typography } from "antd";
 import { useForm, usePage } from "@inertiajs/react";
+import type { ReactElement } from "react";
 import LibraryLayout from "../../Layouts/LibraryLayout";
 import BookForm, { type BookFormState } from "./BookForm";
 
@@ -27,7 +28,7 @@ const Edit = () => {
     };
 
     return (
-        <LibraryLayout>
+        <>
             <div className="hero__header" style={{ marginBottom: 16 }}>
                 <Typography.Title level={2} style={{ margin: 0 }}>
                     แก้ไขหนังสือ
@@ -35,8 +36,10 @@ const Edit = () => {
             </div>
 
             <BookForm form={form} onSubmit={submit} submitLabel="อัปเดต" />
-        </LibraryLayout>
+        </>
     );
 };
+
+Edit.layout = (page: ReactElement) => <LibraryLayout>{page}</LibraryLayout>;
 
 export default Edit;
