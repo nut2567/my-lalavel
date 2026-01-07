@@ -8,6 +8,7 @@ import {
     Space,
     Tag,
     Modal,
+    Pagination,
 } from "antd";
 import { Link, router, usePage } from "@inertiajs/react";
 import LibraryLayout from "../Layouts/LibraryLayout";
@@ -61,7 +62,7 @@ const Books = () => {
             <div className="hero__header" style={{ marginBottom: 16 }}>
                 <div style={{ flex: 1 }}>
                     <Typography.Title level={2} style={{ margin: 0 }}>
-                        รายการหนังสือ
+                        รายการหนังสือ Inertia::render(props)
                     </Typography.Title>
                     <Typography.Text type="secondary">
                         ข้อมูลดึงจากฐานข้อมูลผ่าน Eloquent
@@ -78,7 +79,7 @@ const Books = () => {
                     showIcon
                     closable
                     style={{ marginBottom: 16 }}
-                    title={flashSuccess}
+                    message={flashSuccess}
                 />
             )}
 
@@ -133,52 +134,18 @@ const Books = () => {
             </Row>
 
             <div style={{ marginTop: 16, textAlign: "center" }}>
-                <PaginationLinks
+                <Pagination
                     current={page}
-                    totalPages={totalPages}
-                    onChange={goToPage}
+                    pageSize={props.pagination.perPage}
+                    total={props.pagination.totalItems}
+                    showSizeChanger
+                    onChange={(p) => goToPage(p)}
+                    showQuickJumper
+                    showTotal={(total) => `ทั้งหมด ${total} รายการ`}
                 />
             </div>
         </LibraryLayout>
     );
 };
-
-type PaginationLinksProps = {
-    current: number;
-    totalPages: number;
-    onChange: (page: number) => void;
-};
-
-const PaginationLinks = ({
-    current,
-    totalPages,
-    onChange,
-}: PaginationLinksProps) => (
-    <Space size="small" wrap>
-        <Button
-            type="text"
-            disabled={current <= 1}
-            onClick={() => onChange(Math.max(1, current - 1))}
-        >
-            ก่อนหน้า
-        </Button>
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <Button
-                key={p}
-                type={p === current ? "primary" : "default"}
-                onClick={() => onChange(p)}
-            >
-                {p}
-            </Button>
-        ))}
-        <Button
-            type="text"
-            disabled={current >= totalPages}
-            onClick={() => onChange(Math.min(totalPages, current + 1))}
-        >
-            ถัดไป
-        </Button>
-    </Space>
-);
 
 export default Books;

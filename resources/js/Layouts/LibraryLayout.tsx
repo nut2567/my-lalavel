@@ -15,7 +15,7 @@ type LibraryLayoutProps = {
 };
 
 const libraryNav = [
-    { key: "/books", label: "Books (SSR)", icon: <BookOutlined /> },
+    { key: "/books", label: "Books (Inertia)", icon: <BookOutlined /> },
     { key: "/card", label: "Card (API)", icon: <AppstoreOutlined /> },
 ];
 
