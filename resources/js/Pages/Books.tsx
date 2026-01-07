@@ -59,7 +59,7 @@ const Books = () => {
     };
 
     return (
-        <>
+        <LibraryLayout>
             <div className="hero__header" style={{ marginBottom: 16 }}>
                 <div style={{ flex: 1 }}>
                     <Typography.Title level={2} style={{ margin: 0 }}>
@@ -127,7 +127,7 @@ const Books = () => {
                     <Col span={24}>
                         <Alert
                             type="info"
-                            message="ยังไม่มีข้อมูลหนังสือ ลองเพิ่มเล่มแรกได้เลย"
+                            title="ยังไม่มีข้อมูลหนังสือ ลองเพิ่มเล่มแรกได้เลย"
                             showIcon
                         />
                     </Col>
@@ -138,17 +138,15 @@ const Books = () => {
                 <Pagination
                     current={page}
                     pageSize={props.pagination.perPage}
-                    total={props.pagination.totalItems}
+                    total={totalPages}
                     showSizeChanger
                     onChange={(p) => goToPage(p)}
                     showQuickJumper
                     showTotal={(total) => `ทั้งหมด ${total} รายการ`}
                 />
             </div>
-        </>
+        </LibraryLayout>
     );
 };
-
-Books.layout = (page: ReactElement) => <LibraryLayout>{page}</LibraryLayout>;
 
 export default Books;

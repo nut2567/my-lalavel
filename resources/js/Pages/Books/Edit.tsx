@@ -40,6 +40,4 @@ const Edit = () => {
     );
 };
 
-Edit.layout = (page: ReactElement) => <LibraryLayout>{page}</LibraryLayout>;
-
 export default Edit;

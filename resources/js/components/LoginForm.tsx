@@ -12,11 +12,25 @@ const LoginForm: FC = () => (
             description="สาธิตการจัดวางฟอร์มด้วย Ant Design ไม่มีการส่งข้อมูลจริง"
         />
         <Form layout="vertical">
-            <Form.Item label="อีเมลหรือชื่อผู้ใช้" name="username" rules={[{ required: true, message: "กรอกข้อมูล" }]}>
-                <Input prefix={<UserOutlined />} placeholder="user@example.com" />
+            <Form.Item
+                label="อีเมลหรือชื่อผู้ใช้"
+                name="username"
+                rules={[{ required: true, message: "กรอกข้อมูล" }]}
+            >
+                <Input
+                    prefix={<UserOutlined />}
+                    placeholder="user@example.com"
+                />
             </Form.Item>
-            <Form.Item label="รหัสผ่าน" name="password" rules={[{ required: true, message: "กรอกรหัสผ่าน" }]}>
-                <Input.Password prefix={<LockOutlined />} placeholder="••••••••" />
+            <Form.Item
+                label="รหัสผ่าน"
+                name="password"
+                rules={[{ required: true, message: "กรอกรหัสผ่าน" }]}
+            >
+                <Input.Password
+                    prefix={<LockOutlined />}
+                    placeholder="••••••••"
+                />
             </Form.Item>
             <Space>
                 <Button type="primary">เข้าสู่ระบบ</Button>

@@ -6,7 +6,6 @@ import {
 } from "@ant-design/icons";
 import { useState, type FC, type ReactNode } from "react";
 import { Link, usePage } from "@inertiajs/react";
-import AppLayout from "./AppLayout";
 
 const { Sider, Content } = Layout;
 
@@ -66,83 +65,81 @@ const LibraryLayout: FC<LibraryLayoutProps> = ({ children }) => {
     );
 
     return (
-        <AppLayout>
-            <Layout
-                hasSider={!isMobile}
-                style={{
-                    background: "transparent",
-                    gap: 16,
-                }}
-                className="library-shell"
-            >
-                {!isMobile && (
-                    <Sider
-                        width={240}
-                        theme="light"
-                        style={{
-                            background: "#fff",
-                            borderRadius: 12,
-                            border: "1px solid #f0f0f0",
-                            padding: 12,
-                            position: "sticky",
-                            top: 88,
-                            alignSelf: "flex-start",
-                        }}
-                        breakpoint="md"
-                        collapsedWidth={0}
-                    >
-                        {renderNav()}
-                    </Sider>
-                )}
-
-                <Content
+        <Layout
+            hasSider={!isMobile}
+            style={{
+                background: "transparent",
+                gap: 16,
+            }}
+            className="library-shell"
+        >
+            {!isMobile && (
+                <Sider
+                    width={240}
+                    theme="light"
                     style={{
-                        minHeight: 360,
                         background: "#fff",
                         borderRadius: 12,
                         border: "1px solid #f0f0f0",
-                        padding: 24,
-                        boxShadow: "0 12px 30px rgba(0,0,0,0.05)",
+                        padding: 12,
+                        position: "sticky",
+                        top: 88,
+                        alignSelf: "flex-start",
                     }}
+                    breakpoint="md"
+                    collapsedWidth={0}
                 >
-                    {isMobile && (
-                        <>
-                            <Button
-                                type="text"
-                                icon={<MenuOutlined />}
-                                onClick={() => setMobileSiderOpen(true)}
-                                style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: 8,
-                                    padding: 0,
-                                    marginBottom: 12,
-                                }}
-                            >
-                                Library menu
-                            </Button>
-                            <Drawer
-                                open={mobileSiderOpen}
-                                onClose={() => setMobileSiderOpen(false)}
-                                closable={false}
-                                placement="left"
-                                size={260}
-                                styles={{
-                                    body: {
-                                        padding: 12,
-                                    },
-                                }}
-                                maskClosable
-                            >
-                                {renderNav(() => setMobileSiderOpen(false))}
-                            </Drawer>
-                        </>
-                    )}
+                    {renderNav()}
+                </Sider>
+            )}
 
-                    {children}
-                </Content>
-            </Layout>
-        </AppLayout>
+            <Content
+                style={{
+                    minHeight: 360,
+                    background: "#fff",
+                    borderRadius: 12,
+                    border: "1px solid #f0f0f0",
+                    padding: 24,
+                    boxShadow: "0 12px 30px rgba(0,0,0,0.05)",
+                }}
+            >
+                {isMobile && (
+                    <>
+                        <Button
+                            type="text"
+                            icon={<MenuOutlined />}
+                            onClick={() => setMobileSiderOpen(true)}
+                            style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 8,
+                                padding: 0,
+                                marginBottom: 12,
+                            }}
+                        >
+                            Library menu
+                        </Button>
+                        <Drawer
+                            open={mobileSiderOpen}
+                            onClose={() => setMobileSiderOpen(false)}
+                            closable={false}
+                            placement="left"
+                            size={260}
+                            styles={{
+                                body: {
+                                    padding: 12,
+                                },
+                            }}
+                            maskClosable
+                        >
+                            {renderNav(() => setMobileSiderOpen(false))}
+                        </Drawer>
+                    </>
+                )}
+
+                {children}
+            </Content>
+        </Layout>
     );
 };
 

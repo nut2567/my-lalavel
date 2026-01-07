@@ -22,9 +22,7 @@ export default function render(page: any) {
             ).then((module: any) => {
                 module.default.layout =
                     module.default.layout ||
-                    ((page: ReactNode) => (
-                        <AppLayout>{page}</AppLayout>
-                    ));
+                    ((page: ReactNode) => <AppLayout>{page}</AppLayout>);
                 return module;
             }),
         setup({ App, props }) {
