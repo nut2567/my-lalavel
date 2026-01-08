@@ -29,10 +29,11 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 -   `bootstrap/app.php`: สร้าง `Illuminate\Foundation\Application` แล้วส่งให้ HTTP Kernel provider ถูกฝังใน framework และให้เราคอนฟิกผ่าน app.php แทน
 -   `app.php`: ลงทะเบียน middleware ด้วย withMiddleware แล้วส่งต่อเข้า router ด้วย withRouting แล้วจะเข้าไปสู่
 -   `routes/web.php`: map URL → controller/action หรือ Inertia render
--   Controller: ทำงานตาม route แล้วส่ง response; ถ้า Inertia จะ `Inertia::render(...)`
+-   Controller: ทำงานตาม route แล้วส่ง response;
 -   `app/Http/Middleware/HandleInertiaRequests.php`: เติม shared props/version ก่อนตอบ
--   เมื่อเข้า browser หน้าแรก `:porject.test/`
--   Frontend `resources/js/app.tsx`: mount Inertia app; import `./bootstrap.js`
+-   `protected $rootView`= `app`; ดังนั้นทุกหน้า `Inertia (Inertia::render(...) ใน web.php)` จะเรนเดอร์ผ่าน `app.blade.php`
+-   เมื่อเข้า browser หน้าแรก `porject.test/`
+-   Frontend `resources/js/app.tsx`: mount Inertia app;
 -   Page component (เช่น `resources/js/Pages/Home.tsx`): หน้าแรกที่ผู้ใช้เห็นตามเส้นทางที่เรียก
 -   `Route::get('/', fn() => Inertia::render('Home'));`
 

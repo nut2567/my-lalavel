@@ -11,7 +11,6 @@ import {
     Pagination,
 } from "antd";
 import { Link, router, usePage } from "@inertiajs/react";
-import type { ReactElement } from "react";
 import LibraryLayout from "../Layouts/LibraryLayout";
 
 type Book = { id: number; title: string; author: string; summary?: string };
