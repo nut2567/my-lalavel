@@ -32,13 +32,13 @@ const Books = () => {
     const { props } = usePage<PageProps>();
     const books = props.books ?? [];
     const page = props.pagination?.page ?? 1;
-    const totalPages = props.pagination?.totalPages ?? 1;
+    const totalItems = props.pagination?.totalItems ?? 0;
     const flashSuccess = props.flash?.success;
 
-    const goToPage = (target: number) => {
+    const goToPage = (target: number, pageSize: number) => {
         router.get(
             "/books",
-            { page: target },
+            { page: target, perPage: pageSize },
             { preserveState: true, preserveScroll: true, replace: true }
         );
     };
@@ -137,9 +137,10 @@ const Books = () => {
                 <Pagination
                     current={page}
                     pageSize={props.pagination.perPage}
-                    total={totalPages}
+                    total={totalItems}
                     showSizeChanger
-                    onChange={(p) => goToPage(p)}
+                    onChange={(p, pageSize) => goToPage(p, pageSize)}
+                    onShowSizeChange={(p, pageSize) => goToPage(p, pageSize)}
                     showQuickJumper
                     showTotal={(total) => `ทั้งหมด ${total} รายการ`}
                 />
